@@ -1,7 +1,6 @@
-# Cherry Studio PPT 模板库 · 53 页场景索引
+# Cherry Studio PPT 模板库 · 51 页场景索引
 
 > 每个模板 = 一个可复用的飞书幻灯片布局 XML（960×540）。
-> **P52/P53 为深色变体**（P52 深色章节页、P53 深色封底），深色场景/收尾用。
 > 用法：复制对应 `slideNN.xml` → 按每页『替换』清单**定点替换示例内容**（模板是示例文案，不是空占位符）→ 校验 → `lark-cli slides +add-slide`。
 > 在线预览：https://mcnnox2fhjfq.feishu.cn/slides/Tm0as9VdtlFknLdYX4BcOJdin4b
 

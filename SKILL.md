@@ -1,6 +1,6 @@
 ---
 name: cherry-studio-design-language
-description: Cherry Studio 品牌设计语言 v1.0（20 张截图+Logo 提炼）+ 53 页飞书 PPT 模板库（场景索引/CLI 工作流/排障）。做 PPT/海报/封面/招商材料等任何 Cherry 视觉设计时使用，确保风格统一且可直接套模板。
+description: Cherry Studio 品牌设计语言 v1.0（20 张截图+Logo 提炼）+ 51 页飞书 PPT 模板库（场景索引/CLI 工作流/排障）。做 PPT/海报/封面/招商材料等任何 Cherry 视觉设计时使用，确保风格统一且可直接套模板。
 version: 1.0.0
 license: MIT
 platforms: [macos, linux]
@@ -11,7 +11,7 @@ metadata:
 
 # Cherry Studio 设计语言 v1.0
 
-> **与其他 skill 的关系（重要）**：本 skill 是 Cherry 品牌设计语言与 53 页模板库。当用户要求 Cherry 风格/套用本库模板时，**本 skill 优先于 `lark/lark-slides` 的通用设计原则**（如"信息密度极高""禁止装饰线条"等通用规则，本库按品牌需求采用极简+留白+彩线）。但**必须继续遵守 lark-slides 的硬性技术规则**：960×540 画布边界、fontSize 显式设置、`<img>` 元素、lineSpacing 写法、图表用 `<chart>`、表格行高合计=表格高度。技术排障以 `lark/lark-slides` 官方为准，本 skill 的排障表是实战备忘。
+> **与其他 skill 的关系（重要）**：本 skill 是 Cherry 品牌设计语言与 51 页模板库。当用户要求 Cherry 风格/套用本库模板时，**本 skill 优先于 `lark/lark-slides` 的通用设计原则**（如"信息密度极高""禁止装饰线条"等通用规则，本库按品牌需求采用极简+留白+彩线）。但**必须继续遵守 lark-slides 的硬性技术规则**：960×540 画布边界、fontSize 显式设置、`<img>` 元素、lineSpacing 写法、图表用 `<chart>`、表格行高合计=表格高度。技术排障以 `lark/lark-slides` 官方为准，本 skill 的排障表是实战备忘。
 
 > 依据 20 张官网与桌面端截图 + 官方 Logo 提炼。所有视觉产出（PPT/海报/封面/招商材料）应遵循本规范。
 
@@ -303,10 +303,10 @@ font-family: Inter, "SF Pro Display", "PingFang SC", "HarmonyOS Sans SC", "Micro
 
 ---
 
-## 模板库（53 页布局）
+## 模板库（51 页布局）
 
-`templates/` 目录含 **53 页完整布局 XML**（960×540 飞书 slides 格式）+ `INDEX.md`（53 页场景索引与选择指南，每页标注适用场景/结构/示例/替换指引）。
-**在线预览**：https://mcnnox2fhjfq.feishu.cn/slides/Tm0as9VdtlFknLdYX4BcOJdin4b （53 页完整版，可直接打开对照）
+`templates/` 目录含 **51 页完整布局 XML**（960×540 飞书 slides 格式）+ `INDEX.md`（51 页场景索引与选择指南，每页标注适用场景/结构/示例/替换指引）。
+**在线预览**：https://mcnnox2fhjfq.feishu.cn/slides/Tm0as9VdtlFknLdYX4BcOJdin4b （51 页完整版，可直接打开对照）
 
 ### 使用流程（6 步，不可跳过）
 
@@ -325,7 +325,7 @@ font-family: Inter, "SF Pro Display", "PingFang SC", "HarmonyOS Sans SC", "Micro
 
 ### 布局覆盖
 
-封面/转场×7（P1-P6、P51：P1 品牌 / P2 产品 / P3 章节 / P4 三栏方案 / P5 彩点 / P6 CTA / P51 谢谢）/ 深色变体×2（P52/P53）/ 目录导航×3（P7-P9）/ 文本论证×8（P10-P17）/ 数据图表×8（P18-P25）/ 流程架构×7（P26-P32）/ 产品方案×6（P33-P38）/ 规划组织×6（P39-P44）/ 生态社区×6（P45-P50）= 53 页
+封面/转场×7（P1-P6、P51：P1 品牌 / P2 产品 / P3 章节 / P4 三栏方案 / P5 彩点 / P6 CTA / P51 谢谢）/ 目录导航×3（P7-P9）/ 文本论证×8（P10-P17）/ 数据图表×8（P18-P25）/ 流程架构×7（P26-P32）/ 产品方案×6（P33-P38）/ 规划组织×6（P39-P44）/ 生态社区×6（P45-P50）= 51 页
 
 ### 布局选择决策树
 

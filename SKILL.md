@@ -306,6 +306,34 @@ font-family: Inter, "SF Pro Display", "PingFang SC", "HarmonyOS Sans SC", "Micro
 
 ---
 
+## Review 能力（排版检查）
+
+本 skill 自带排版 Review 脚本：`scripts/review_layout.py`，创建/修改模板后**必须**跑一遍，自动检查：
+
+| 检查项 | 检测内容 |
+|--------|----------|
+| 越界/负坐标 | 元素超出 960×540 画布或负坐标 |
+| 文本溢出 | 单行超宽 / 多行超框（含 wrap 自动换行估算） |
+| 文本重叠 | 两个文本元素实际文字区域相交（排除装饰引号、框虚宽） |
+| 重复属性 | 同一标签内属性名重复（XML 隐患） |
+| 空段落 | `<p></p>` 空段落 |
+| 字面换行 | `<p>` 内的 `\n`（渲染时可能被省略） |
+| 一致性 | 页眉 Logo 位置、页脚 Y 坐标 |
+
+**用法**：
+```bash
+# 检查整个模板库
+python3 scripts/review_layout.py --dir templates/
+# 检查单个文件
+python3 scripts/review_layout.py --input slide01.xml
+# JSON 输出（供脚本解析）
+python3 scripts/review_layout.py --dir templates/ --json
+```
+
+**准出标准**：`errors=0, warnings=0` 才算通过。warning 允许人工判断（如封底稀疏内容属预期）。
+
+**配合**：官方 `xml_lint.py`（schema 语法）+ 本脚本（排版布局）+ 截图目检（渲染最终确认），三者为完整 Review 链。
+
 ## 模板库（51 页布局）
 
 `templates/` 目录含 **51 页完整布局 XML**（960×540 飞书 slides 格式）+ `INDEX.md`（51 页场景索引与选择指南，每页标注适用场景/结构/示例/替换指引）。

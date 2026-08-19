@@ -11,6 +11,9 @@ metadata:
 
 # Cherry Studio 设计语言 v1.0
 
+> ⭐ **默认模板（2026-08-19 王新铭定稿）**：本 skill 是以后所有 Cherry Studio 相关 PPT 的默认模板。做 PPT 时默认：纯白底 + 本库 51 页布局，先读 `templates/INDEX.md` 选页，再按流程创建。深色整页禁用（手机预览圆角突兀）。
+> 在线预览：https://mcnnox2fhjfq.feishu.cn/slides/Tm0as9VdtlFknLdYX4BcOJdin4b
+
 > **与其他 skill 的关系（重要）**：本 skill 是 Cherry 品牌设计语言与 51 页模板库。当用户要求 Cherry 风格/套用本库模板时，**本 skill 优先于 `lark/lark-slides` 的通用设计原则**（如"信息密度极高""禁止装饰线条"等通用规则，本库按品牌需求采用极简+留白+彩线）。但**必须继续遵守 lark-slides 的硬性技术规则**：960×540 画布边界、fontSize 显式设置、`<img>` 元素、lineSpacing 写法、图表用 `<chart>`、表格行高合计=表格高度。技术排障以 `lark/lark-slides` 官方为准，本 skill 的排障表是实战备忘。
 
 > 依据 20 张官网与桌面端截图 + 官方 Logo 提炼。所有视觉产出（PPT/海报/封面/招商材料）应遵循本规范。

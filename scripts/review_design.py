@@ -105,11 +105,13 @@ def review_slide(path: Path) -> dict:
         issue("warning", "font_hierarchy_too_many", f"字号种类过多: {len(set(sizes))} 种（建议 ≤5）")
 
     # G4: 结论条（每页 ≤1；规格校验）
-    # 识别：浅红底 rgba(253,235,237,1) 的 round-rect
+    # 识别：浅红底 rgba(253,235,237,1) + 珊瑚红边框 rgba(255,90,95,1) + 高度 30-40 的 round-rect
+    # （排除同样浅红底的对照卡：对照卡是白边框或高度 >60）
     conclusion_bars = list(re.finditer(
-        r'<shape type="round-rect"[^>]*topLeftY="(\d+)"[^>]*height="(\d+)"[^>]*><fill><fillColor color="rgba\(253,\s*235,\s*237,\s*1\)"',
+        r'<shape type="round-rect"[^>]*topLeftY="(\d+)"[^>]*height="(\d+)"[^>]*><fill><fillColor color="rgba\(253,\s*235,\s*237,\s*1\)"/></fill><border color="rgba\(255,\s*90,\s*95,\s*1\)"[^>]*width="1"/>',
         c,
     ))
+    conclusion_bars = [m for m in conclusion_bars if 28 <= int(m.group(2)) <= 44]
     if len(conclusion_bars) > 1:
         issue("error", "conclusion_dup", f"结论条数量 >1: {len(conclusion_bars)} 个")
     elif len(conclusion_bars) == 1:

@@ -4,19 +4,29 @@ AI-agent skill for building **Lark (Feishu) slides via the `lark-cli`**: a 51-pa
 
 Built as a reusable SKILL.md so agents can produce polished, on-brand presentations quickly — pick a template, swap content, lint, publish.
 
+## Template preview
+
+![51-page template library preview](docs/template-preview.jpg)
+
+*Sample pages: cover, TOC, three-column, statement, step cards (P16), metric grid, comparison table, process flow, feature matrix, ROI.*
+
 ## What's inside
 
 ```
 .
 ├── SKILL.md                 # Design spec + template workflow + CLI commands + troubleshooting
+├── tokens.yaml              # Single source of truth for design tokens (42-color whitelist)
 ├── templates/
 │   ├── INDEX.md             # 51-page scene index (per page: use case / structure / replace list)
 │   └── slide01.xml ~ slide51.xml  # 960×540 Lark Slides XML templates
 ├── assets/
 │   ├── cherry-logo.png      # Example logo asset (1024×1024 transparent PNG)
 │   └── product-placeholder.png  # Product screenshot placeholder
-└── scripts/
-    └── review_layout.py     # Automated layout check (overlap / overflow / out-of-bounds)
+├── scripts/
+│   ├── review_layout.py     # Automated layout check (overlap / overflow / out-of-bounds)
+│   └── review_design.py     # Design guardrails G1-G8 (color whitelist / typography / CTA / density)
+└── docs/
+    └── template-preview.jpg # 10-page preview grid
 ```
 
 ## Template coverage
@@ -34,19 +44,29 @@ Built as a reusable SKILL.md so agents can produce polished, on-brand presentati
 
 ## Quick start (agent view)
 
-1. Read `templates/INDEX.md`, pick a template by content type
+1. Read `templates/INDEX.md`, pick a template by content type (scene matching)
 2. Copy `slideXX.xml` + `assets/*.png` into a work dir
-3. Replace sample content per the INDEX "replace" checklist (templates are a starting point — adjust layout/density to fit content, keep the brand tokens)
-4. Lint: `python3 scripts/review_layout.py --input slide.xml`
-5. Publish via `lark-cli slides +create / +add-slide`
+3. Replace sample content per the INDEX "replace" checklist — **clean ALL template placeholder text** (titles, footnotes, conclusion bars); keep brand tokens
+4. Run the three-stage gate:
+   ```bash
+   # Stage 1: official schema lint (per slide, error_count must be 0)
+   python3 <lark-slides>/scripts/xml_lint.py --input slideXX.xml
+   # Stage 2: layout check (overlap / overflow / out-of-bounds)
+   python3 scripts/review_layout.py --dir .
+   # Stage 3: design guardrails (color whitelist / typography / CTA / density)
+   python3 scripts/review_design.py --dir .
+   ```
+5. Screenshot-check with `lark-cli slides +screenshot` before publishing
+6. Publish via `lark-cli slides +create / +add-slide`
 
 ## Design tokens
 
 - White canvas `#FFFFFF` + bold black headings `#171717` + white cards with thin border `#D6D6D2`
 - Coral red `#FF5A5F` as the single brand accent (logo #FF5757)
-- Black button = the only CTA; restrained accent lines (pink/cyan/purple/blue/green/yellow)
-- 17 anti-patterns (no blue-purple gradients / no coral-red fills / no heavy shadows-glassmorphism...)
-- Exact palette & font sizes: see SKILL.md (template values are authoritative)
+- **No dark fills**: black is for text/icon strokes only (no dark cards, headers, or CTA bars)
+- **No bottom pill bars**: no full-width coral pills at page bottom (y>430)
+- Exact palette & font sizes: `tokens.yaml` is the **single machine source** (42-color whitelist)
+- 70/30 strategy: 70% follow a matched template layout, 30% adapt content area freely, 100% alignment accuracy (no overlap / overflow / off-canvas)
 
 ## Dependencies
 

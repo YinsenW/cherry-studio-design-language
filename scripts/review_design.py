@@ -104,29 +104,24 @@ def review_slide(path: Path) -> dict:
     if len(set(sizes)) > 6:
         issue("warning", "font_hierarchy_too_many", f"字号种类过多: {len(set(sizes))} 种（建议 ≤5）")
 
-    # G4: 结论条（每页 ≤1；规格校验）
-    # 识别：浅红底 rgba(253,235,237,1) + 珊瑚红边框 rgba(255,90,95,1) + 高度 30-40 的 round-rect
-    # （排除同样浅红底的对照卡：对照卡是白边框或高度 >60）
-    conclusion_bars = list(re.finditer(
-        r'<shape type="round-rect"[^>]*topLeftY="(\d+)"[^>]*height="(\d+)"[^>]*><fill><fillColor color="rgba\(253,\s*235,\s*237,\s*1\)"/></fill><border color="rgba\(255,\s*90,\s*95,\s*1\)"[^>]*width="1"/>',
+    # G4: 页面底部禁横贯长胶囊条（浅红/珊瑚粉，y>430 且宽>400 且高<=60）
+    for m in re.finditer(
+        r'<shape type="round-rect"[^>]*topLeftY="(\d+)"[^>]*width="(\d+)"[^>]*height="(\d+)"[^>]*><fill><fillColor color="rgba\((253,\s*235,\s*237|255,\s*90,\s*95)[^"]*"',
         c,
-    ))
-    conclusion_bars = [m for m in conclusion_bars if 28 <= int(m.group(2)) <= 44]
-    if len(conclusion_bars) > 1:
-        issue("error", "conclusion_dup", f"结论条数量 >1: {len(conclusion_bars)} 个")
-    elif len(conclusion_bars) == 1:
-        # 检查位置在页面下半部
-        y = int(conclusion_bars[0].group(1))
-        if y < 300:
-            issue("warning", "conclusion_position", f"结论条位置偏高 (y={y})，建议 420-480")
+    ):
+        y, w, h = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        if y > 430 and w > 400 and h <= 60:
+            issue("error", "bottom_pill_bar", f"页面底部横贯长胶囊条 (y={y},{w}x{h}) — 禁止")
 
-    # G5: 主 CTA（黑色实心按钮 ≤1）
+    # G5: 主 CTA（禁用黑色填充按钮）
     black_btns = len(re.findall(
         r'<shape type="round-rect"[^>]*><fill><fillColor color="rgba\(23,\s*23,\s*23,\s*1\)"',
         c,
     ))
     if black_btns > 1:
-        issue("warning", "multi_cta", f"黑色 CTA 数量 >1: {black_btns} 个")
+        issue("warning", "multi_cta", f"黑色 CTA 数量 >1: {black_btns} 个（黑底 CTA 已禁用，应改白底珊瑚红描边）")
+    elif black_btns == 1:
+        issue("warning", "black_cta", "发现黑色填充 CTA — 已禁用，应改白底+珊瑚红描边")
 
     # G8: 深色整页禁用（页面背景不得为深色）
     bg = re.search(r'<style><fill><fillColor color="rgba\((\d+),\s*(\d+),\s*(\d+),\s*1\)"', c)

@@ -350,9 +350,9 @@ python3 scripts/review_layout.py --dir templates/ --json
    test -f ./cherry-logo.png   # 门禁：图片必须到位（lint 不查图片存在性）
    ```
 3. 替换内容（**注意**：模板是"示例内容"，不是 `[占位]` 占位符——按 INDEX.md 每页的"必换字段"清单定点替换：标题、数据、图片、邮箱、年份、右上版式名、页脚 Internal Template；禁止把示例数据/虚构客户/邮箱直接交付。**版式可微调**：内容多少与模板不符时，允许按上方"替换原则"调整卡片尺寸/间距/字号/模块数，以内容呈现最优为准，但保持品牌视觉规范）
-4. 校验（**官方准出**）：`xml_lint.py`（当前环境 lark-slides skill 的 scripts/）→ error_count=0
-5. 回读验证：`+xml-get` 断言页数、img 已变 file_token、关键标题已变；`+screenshot` 目检（不能出现 `Internal Template` 和版式标签）
-6. 创建/更新：见下方 lark-cli 命令
+4. 校验（**官方准出**）：`xml_lint.py`（当前环境 lark-slides skill 的 scripts/）→ error_count=0；再用 `scripts/review_layout.py` 检查排版（越界/溢出/重叠，errors=0）
+5. 创建/更新：见下方 lark-cli 命令（`+create` 或 `+update-slide`）
+6. 回读验证：`+xml-get` 断言页数、img 已变 file_token、关键标题已变；`+screenshot` 目检（不能出现 `Internal Template` 和版式标签）
 
 ### 布局覆盖
 
@@ -432,7 +432,10 @@ python3 scripts/review_layout.py --dir templates/ --json
 lark-cli slides +create --title "标题" --as user
 # 加页（图片自动上传）
 lark-cli slides +add-slide --presentation $PID --slide @./slide01.xml --as user
+```
+
 ### 批量建页（≤10 页/次，避免逐页循环重复上传图片）
+
 ```bash
 # 一次性建多页（图片自动上传，去重）
 lark-cli slides +create --title "标题" --slide @./s01.xml --slide @./s02.xml ... --as user
@@ -450,7 +453,6 @@ lark-cli slides +xml-get --presentation $PID --as user
 lark-cli slides +screenshot --presentation $PID --slide-number 1 --slide-number 2 --slide-number 3 --as user
 # 批量截图用逗号形式：--slide-number "1,2,3"
 # 实际输出路径以返回 JSON 的 screenshots[].path 为准（默认 .lark-slides/screenshots/）
-```
 
 ### 验证清单（创建/改写后必做）
 

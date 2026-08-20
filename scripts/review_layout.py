@@ -12,6 +12,7 @@ import argparse
 import json
 import re
 import sys
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 # ── 画布 ──
@@ -45,11 +46,21 @@ def parse_float(s: str | None, default: float = 0.0) -> float:
 # ── 单文件检查 ──
 def review_slide(path: Path) -> dict:
     """检查一个 slide XML，返回问题列表。"""
-    c = path.read_text(encoding="utf-8")
+    try:
+        c = path.read_text(encoding="utf-8")
+    except OSError as e:
+        return {"path": str(path), "errors": [{"level": "error", "code": "read_failed", "message": f"读取失败: {e}"}], "warnings": [], "issues": []}
     issues: list[dict] = []
 
     def issue(level: str, code: str, message: str, element: str = "") -> None:
         issues.append({"level": level, "code": code, "message": message, "element": element})
+
+    # 0. XML 解析（P1-4: 格式错误必须报 invalid_xml，不能零问题）
+    try:
+        root = ET.fromstring(c)
+    except ET.ParseError as e:
+        issue("error", "invalid_xml", f"XML 解析失败: {e}")
+        return {"path": str(path), "errors": issues, "warnings": [], "issues": issues}
 
     # 1. 颜色格式异常（历史 bug：(3, 'rgba...' 或 'rgba...' 包裹）
     if "(3, '" in c:
@@ -70,38 +81,52 @@ def review_slide(path: Path) -> dict:
         if v < 6:
             issue("error", "font_size_too_small", f"fontSize={v} 小于最小值 6")
 
-    # 4. 越界 / 负坐标（所有带 topLeftX/topLeftY 的元素）
-    for m in re.finditer(
-        r'<[^>]*?topLeftX="([-\d.]+)"[^>]*?topLeftY="([-\d.]+)"[^>]*?width="([\d.]+)"[^>]*?height="([\d.]+)"',
-        c,
-    ):
-        x, y, w, h = (parse_float(m.group(i)) for i in range(1, 5))
+    # 4. 越界 / 负坐标（P1-1: 用 XML 树遍历，属性顺序无关）
+    for el in root.iter():
+        x = parse_float(el.get("topLeftX"), None) if el.get("topLeftX") is not None else None
+        y = parse_float(el.get("topLeftY"), None) if el.get("topLeftY") is not None else None
+        w = parse_float(el.get("width"), None) if el.get("width") is not None else None
+        h = parse_float(el.get("height"), None) if el.get("height") is not None else None
+        if x is None or y is None:
+            continue
         if x < -0.5 or y < -0.5:
             issue("error", "negative_coord", f"负坐标 ({x},{y})")
-        if x + w > CANVAS_W + 0.5 or y + h > CANVAS_H + 0.5:
-            issue("error", "out_of_bounds", f"越界 ({x},{y}) {w}x{h} 超出 {CANVAS_W}x{CANVAS_H}")
+        if w is not None and h is not None:
+            if x + w > CANVAS_W + 0.5 or y + h > CANVAS_H + 0.5:
+                issue("error", "out_of_bounds", f"越界 ({x},{y}) {w}x{h} 超出 {CANVAS_W}x{CANVAS_H}")
 
-    # 5. 文本溢出（单行不换行 wrap=false 场景）
-    for m in re.finditer(
-        r'<shape type="text"[^>]*topLeftX="([\d.]+)"[^>]*topLeftY="([\d.]+)"[^>]*width="([\d.]+)"[^>]*height="([\d.]+)"[^>]*>(.*?)</shape>',
-        c,
-        re.DOTALL,
-    ):
-        x, y, w, h = (parse_float(m.group(i)) for i in range(1, 5))
-        content = m.group(5)
-        wrap_m = re.search(r'wrap="(\w+)"', content)
-        wrap = wrap_m.group(1) if wrap_m else "true"
-        fs_m = re.search(r'fontSize="([\d.]+)"', content)
-        fs = parse_float(fs_m.group(1), 14)
-        line_spacing_m = re.search(r'lineSpacing="([\d.]+)"', content)
-        ls = parse_float(line_spacing_m.group(1), 1.2) if line_spacing_m else 1.2
+    # 5. 文本溢出（P1-2: lineSpacing multiple:/fixed: 分别处理；P1-3: 多段落累加）
+    for el in root.iter():
+        if el.tag != "shape" or el.get("type") != "text":
+            continue
+        x = parse_float(el.get("topLeftX"), 0.0)
+        y = parse_float(el.get("topLeftY"), 0.0)
+        w = parse_float(el.get("width"), 0.0)
+        h = parse_float(el.get("height"), 0.0)
+        # 从 <style> 里读属性（属性顺序无关）
+        style = el.find("style") or el
+        wrap = (style.get("wrap") or "true").lower()
+        fs = parse_float(style.get("fontSize"), 14)
+        # lineSpacing: "multiple:N" → 倍率；"fixed:N" → 固定 px
+        ls_raw = style.get("lineSpacing") or ""
+        if ls_raw.startswith("multiple:"):
+            ls = parse_float(ls_raw.split(":", 1)[1], 1.2)
+            ls_mode = "multiple"
+        elif ls_raw.startswith("fixed:"):
+            ls = parse_float(ls_raw.split(":", 1)[1], 20)
+            ls_mode = "fixed"
+        else:
+            ls = 1.2
+            ls_mode = "multiple"
 
-        for p in re.finditer(r"<p>(.*?)</p>", content, re.DOTALL):
-            text = p.group(1).replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
-            if not text.strip():
+        # 收集所有 <p> 文本（含子元素 text 内容）
+        total_lines = 0
+        for p in el.iter("p"):
+            text = "".join(p.itertext()).strip()
+            if not text:
                 continue
             # 装饰引号（" 或 ' 单独成行）不检查溢出——故意超出框的视觉元素
-            if re.fullmatch(r"[“”\"'‘’]{1,2}", text.strip()):
+            if re.fullmatch(r"[“”\"'‘’]{1,2}", text):
                 continue
             ew = est_text_width(text, fs)
             if wrap == "false":
@@ -113,29 +138,33 @@ def review_slide(path: Path) -> dict:
                         f"({x},{y}) {w}x{h}",
                     )
             else:
-                # 换行：行数 × 行高 vs 框高
-                lines = max(1, int(ew / max(w, 1)) + 1)
-                need_h = lines * fs * ls
-                # 大数字强调块（fs≥24 且内容短）允许 30% 余量——关键数据放大是设计
-                tolerance = 1.30 if (fs >= 24 and len(text) <= 4) else 1.05
-                if need_h > h * tolerance:
-                    issue(
-                        "error", "text_overflow_wrap",
-                        f"文本溢出（换行）: “{text[:20]}...” 需{lines}行×{fs*ls:.0f}px={need_h:.0f}px > 框高{h:.0f}px",
-                        f"({x},{y}) {w}x{h}",
-                    )
+                # 换行：行数 × 行高（P1-3: ceil，避免整除多算一行）
+                import math
+                lines = max(1, math.ceil(ew / max(w, 1)))
+                total_lines += lines
+        if total_lines:
+            line_height = fs * ls if ls_mode == "multiple" else ls
+            need_h = total_lines * line_height
+            # 大数字强调块（fs≥24 且内容短）允许 30% 余量——关键数据放大是设计
+            tolerance = 1.30 if (fs >= 24 and total_lines <= 1) else 1.05
+            if need_h > h * tolerance:
+                issue(
+                    "error", "text_overflow_wrap",
+                    f"文本溢出（换行）: 需{total_lines}行×{line_height:.0f}px={need_h:.0f}px > 框高{h:.0f}px",
+                    f"({x},{y}) {w}x{h}",
+                )
 
-    # 6. 重叠：文本元素之间（bbox 相交且非嵌套）
+    # 6. 重叠：文本元素之间（bbox 相交且非嵌套；P1-1: 用 XML 树）
     texts = []
-    for m in re.finditer(
-        r'<shape type="text"[^>]*topLeftX="([\d.]+)"[^>]*topLeftY="([\d.]+)"[^>]*width="([\d.]+)"[^>]*height="([\d.]+)"[^>]*>(.*?)</shape>',
-        c,
-        re.DOTALL,
-    ):
-        x, y, w, h = (parse_float(m.group(i)) for i in range(1, 5))
-        content = m.group(5)
-        first_p = re.search(r"<p>(.*?)</p>", content, re.DOTALL)
-        label = first_p.group(1)[:12] if first_p else "?"
+    for el in root.iter():
+        if el.tag != "shape" or el.get("type") != "text":
+            continue
+        x = parse_float(el.get("topLeftX"), 0.0)
+        y = parse_float(el.get("topLeftY"), 0.0)
+        w = parse_float(el.get("width"), 0.0)
+        h = parse_float(el.get("height"), 0.0)
+        first_p = el.find(".//p")
+        label = "".join(first_p.itertext())[:12] if first_p is not None else "?"
         # 跳过装饰引号（视觉元素允许重叠）
         if re.fullmatch(r"[“”\"'‘’]{1,2}", label.strip()):
             continue

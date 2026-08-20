@@ -55,4 +55,5 @@ Built as a reusable SKILL.md so agents can produce polished, on-brand presentati
 
 ## License
 
-MIT © 2026
+- **Code, templates, and scripts**: MIT © 2026
+- **Brand assets** (e.g. `assets/cherry-logo.png`): brand/logo assets are **not** covered by the MIT license — they are the property of their respective owners and included only as examples. Replace them with your own assets for production use.

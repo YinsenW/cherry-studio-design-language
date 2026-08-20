@@ -233,7 +233,7 @@ def main() -> int:
             "results": results,
         }, ensure_ascii=False, indent=2))
 
-    return 1 if total_errors else 0
+    return 1 if total_errors or total_warnings else 0
 
 
 if __name__ == "__main__":

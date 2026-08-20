@@ -470,6 +470,7 @@ python3 scripts/review_layout.py --dir templates/ --json
 **调整后的验收**：任何调整（尤其字号缩小/卡片改动）后，必须重新 `xml_lint.py` + `review_layout.py` + 截图目检，确保无溢出/重叠/越界。宁可缩小字号 + 增加行距，也不要让文字溢出卡片。
 
 **XML 结构铁律（2026-08-20 实战）**：
+0. **背景定义铁律（最高优先）**：`<slide>` 的 `<style>` **第一个匿名 fill 必须是白色背景**（`<fill><fillColor color="rgba(255,255,255,1)"/></fill>`），后续命名 fill（id=）才能放品牌色——**否则整页底色会变成第一个 fill 的颜色**（实战：P4/P5 整页变红）；新建/重建页面时对照模板库 slide04 的开头结构
 1. `<slide>` 下**只能有** `<style>`、`<data>`、`<note>`——所有 `<img>`/`<shape>`/`<table>` 必须在 `<data>` 内
 2. `<p>` 内**禁止字面换行符** `\n`（渲染被省略）——多行拆成多个 `<p>`
 3. 表格 `<td>` 内的 `<fill>` 后必须跟 `<content>`（`</fill>content` 缺 `<` 会 mismatched tag）

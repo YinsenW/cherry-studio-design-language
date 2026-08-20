@@ -11,7 +11,7 @@ metadata:
 
 # Cherry Studio 设计语言 v1.0
 
-> ⭐ **默认模板（2026-08-19 王新铭定稿）**：本 skill 是以后所有 Cherry Studio 相关 PPT 的默认模板。做 PPT 时默认：纯白底 + 本库 51 页布局，先读 `templates/INDEX.md` 选页，再按流程创建。深色整页禁用（手机预览圆角突兀）。
+> ⭐ **默认模板（2026-08-19 定稿）**：本 skill 是以后所有 Cherry Studio 相关 PPT 的默认模板。做 PPT 时默认：纯白底 + 本库 51 页布局，先读 `templates/INDEX.md` 选页，再按流程创建。深色整页禁用（手机预览圆角突兀）。
 > 在线预览：https://mcnnox2fhjfq.feishu.cn/slides/Tm0as9VdtlFknLdYX4BcOJdin4b
 
 > **与其他 skill 的关系（重要）**：本 skill 是 Cherry 品牌设计语言与 51 页模板库。当用户要求 Cherry 风格/套用本库模板时，**本 skill 优先于 `lark/lark-slides` 的通用设计原则**（如"信息密度极高""禁止装饰线条"等通用规则，本库按品牌需求采用极简+留白+彩线）。但**必须继续遵守 lark-slides 的硬性技术规则**：960×540 画布边界、fontSize 显式设置、`<img>` 元素、lineSpacing 写法、图表用 `<chart>`、表格行高合计=表格高度。技术排障以 `lark/lark-slides` 官方为准，本 skill 的排障表是实战备忘。
@@ -407,7 +407,7 @@ python3 scripts/review_layout.py --dir templates/ --json
 ### 环境要求（重要！）
 - **必须用 terminal 工具跑**（execute_code 子进程缺 gateway 环境会报错）
 - **身份**：默认显式 `--as user`（用户资源）；只有用户明确要求才用 `--as bot`
-- **profile**：本机已通过 `LARKSUITE_CLI_PROFILE` 环境变量锁定 cli_a930（王新铭）。写操作前用 `lark-cli auth status` 确认当前身份与目标资源一致；跨机器使用时 profile 按本机配置，勿硬编码
+- **profile**：通过本机的 `LARKSUITE_CLI_PROFILE` 环境变量配置，勿在 skill 中硬编码。写操作前用 `lark-cli auth status` 确认当前身份与目标资源一致
 - **相对路径**：`--content`/`--slide`/`--pages` 只接受相对路径
 - **图片占位符**：`<img src="@./cherry-logo.png">` 相对**当前目录**解析（不是 @file 的目录）——运行前确保当前目录有图片
 

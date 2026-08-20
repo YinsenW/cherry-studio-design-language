@@ -311,7 +311,27 @@ font-family: Inter, "SF Pro Display", "PingFang SC", "HarmonyOS Sans SC", "Micro
 
 ---
 
-## Review 能力（排版检查）
+## Review 能力（排版检查 + 设计护栏）
+
+**三级准出链**（2026-08-20 升级）：
+1. **官方 schema**：`xml_lint.py` → error_count=0（技术合法性）
+2. **排版检查**：`scripts/review_layout.py` → errors=0, warnings=0（越界/溢出/重叠/错位）
+3. **设计护栏**：`scripts/review_design.py` → errors=0（颜色白名单/字号层级/结论条/CTA/深色页），warnings 人工裁决
+
+```bash
+python3 scripts/review_design.py --dir templates/    # 目录全检
+python3 scripts/review_design.py --input slide.xml   # 单文件
+```
+
+**设计护栏检查项（G1-G8）**：
+- G1 颜色白名单：所有颜色必须来自 `tokens.yaml`（单一来源），禁止自由近似色
+- G2 强调色限量：每页高饱和强调色 ≤2 种（珊瑚红 + ≤1 个 AI 色）
+- G3 字号层级：页标题 28-30 / 卡标题 16-18 / 正文 12-14 / 标签 10-11；正文 <10 报错
+- G4 结论条组件化：唯一规格（#FDEBED 底 + 珊瑚红字 + 圆角 16），每页 ≤1
+- G5 一页一 CTA：黑色主 CTA 每页 ≤1
+- G6 排版底检：越界/负坐标/溢出/重叠（沿用 review_layout）
+- G7 密度与留白：内容区占画布 55-70%，单卡正文 ≤4 行
+- G8 深色页受限：深色背景仅章节/结尾页，占全套 ≤20%
 
 本 skill 自带排版 Review 脚本：`scripts/review_layout.py`，创建/修改模板后**必须**跑一遍，自动检查：
 

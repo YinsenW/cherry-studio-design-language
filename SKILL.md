@@ -553,6 +553,21 @@ lark-cli slides +screenshot --presentation $PID --slide-number 1 --slide-number 
 # 批量截图用逗号形式：--slide-number "1,2,3"
 # 实际输出路径以返回 JSON 的 screenshots[].path 为准（默认 .lark-slides/screenshots/）
 
+### 更新前必做：防覆盖用户手动修改（2026-08-20 用户定稿，最高优先）
+
+**任何 `+update-slide` / `+replace-slide` 批量操作前，必须先检查版本，用户手动改过必须妥善合并，禁止直接覆盖。**
+
+1. **先回读线上当前版本**：`lark-cli slides +xml-get --presentation $PID --as user`，保存线上 XML
+2. **对比线上 vs 本地**（逐页）：
+   - 文本差异：`<p>` 内容不同（含 `<span>` 内的用户编辑痕迹——飞书编辑器会把用户改过的文字包成 `<span fontSize="...">`）
+   - 图片差异：`<img>` 数量/位置/`src`（file_token）不同（用户可能手动加/换图）
+   - 页面顺序：slide_id 顺序与本地假设不符（用户可能重排页面）
+3. **发现差异 = 用户手动修改过**：
+   - 逐项列出差异给用户确认，或**合并**（把用户修改应用回本地版本，保留我的必要修复）
+   - **绝不直接覆盖**：不要用本地 XML 整体替换含用户修改的线上页面
+4. **历史版本兜底**：若已误覆盖，用 `+history-list` 找用户修改后的版本 → `+history-revert` 回滚 → `+xml-get` 保存用户版 → 合并修复 → 重新更新
+5. **批量更新前风险自查**：本地 XML 是否来自模板（缺用户加的主视觉图/产品图？）——用模板做整页替换时最容易丢图，先对比 img 清单
+
 ### 验证清单（创建/改写后必做）
 
 1. ✅ 官方 `xml_lint.py` → error_count=0（唯一准出；注意 **lint 不校验 `@./` 图片存在性**，缺失图片到 add-slide 才暴露，最终闸门是截图目检）
@@ -585,6 +600,7 @@ lark-cli slides +screenshot --presentation $PID --slide-number 1 --slide-number 
 6. execute_code 不能跑 lark-cli → 必须 terminal
 7. 更新后必须回读验证（可能返回 ok 但实际失败）
 8. 颜色格式必须 `rgba(r, g, b, a)` 无多余引号/括号——曾出现 `(3, 'rgba(...)')` 污染
+9. **整页替换会丢用户手动修改**（2026-08-20 实战教训）：用模板/本地 XML `+update-slide` 整体替换页面时，会覆盖用户在飞书上手动改的文字（含 `<span>` 编辑痕迹）、手加的图片（如封面主视觉图）、重排的页面顺序——**更新前必须先回读对比**（见「更新前必做」），已误覆盖用 `+history-list` + `+history-revert` 恢复
 
 ## Logo 使用
 

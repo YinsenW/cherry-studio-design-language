@@ -1,55 +1,58 @@
-# Cherry Studio Design Language & PPT Template Library
+# Feishu PPT Skill — Lark Slides Template Library for AI Agents
 
-Cherry Studio 品牌设计语言 v1.0 + **53 页飞书幻灯片（Lark Slides）模板库**，以可复用 SKILL.md 形式提供，供 AI agent 快速产出风格统一的品牌视觉材料。
+AI-agent skill for building **Lark (Feishu) slides via the `lark-cli`**: a 51-page template library, brand design tokens, XML generation workflow, and automated layout review.
 
-## 包含什么
+Built as a reusable SKILL.md so agents can produce polished, on-brand presentations quickly — pick a template, swap content, lint, publish.
+
+## What's inside
 
 ```
 .
-├── SKILL.md                 # 完整设计规范 + 模板库使用工作流 + CLI 命令 + 排障手册
+├── SKILL.md                 # Design spec + template workflow + CLI commands + troubleshooting
 ├── templates/
-│   ├── INDEX.md             # 53 页场景索引（每页：适用场景/结构/替换清单）
-│   └── slide01.xml ~ slide53.xml  # 960×540 飞书 Slides XML 模板
-└── assets/
-    ├── cherry-logo.png      # 官方 Logo（1024×1024 透明 PNG）
-    └── product-placeholder.png  # 产品截图占位图
+│   ├── INDEX.md             # 51-page scene index (per page: use case / structure / replace list)
+│   └── slide01.xml ~ slide51.xml  # 960×540 Lark Slides XML templates
+├── assets/
+│   ├── cherry-logo.png      # Example logo asset (1024×1024 transparent PNG)
+│   └── product-placeholder.png  # Product screenshot placeholder
+└── scripts/
+    └── review_layout.py     # Automated layout check (overlap / overflow / out-of-bounds)
 ```
 
-## 模板覆盖
+## Template coverage
 
-| 类别 | 页数 | 页码 |
-|------|------|------|
-| 封面 / 转场 / 封底 | 7 | P1-P6, P51 |
-| 深色变体（章节页 / 封底） | 2 | P52, P53 |
-| 目录 / 导航 | 3 | P7-P9 |
-| 文本 / 论证 | 8 | P10-P17 |
-| 数据 / 图表 | 8 | P18-P25 |
-| 流程 / 架构 | 7 | P26-P32 |
-| 产品 / 方案 | 6 | P33-P38 |
-| 规划 / 组织 | 6 | P39-P44 |
-| 生态 / 社区 | 6 | P45-P50 |
+| Category | Pages | Range |
+|----------|-------|-------|
+| Cover / transition / closing | 7 | P1-P6, P51 |
+| TOC / navigation | 3 | P7-P9 |
+| Text / argumentation | 8 | P10-P17 |
+| Data / charts | 8 | P18-P25 |
+| Flow / architecture | 7 | P26-P32 |
+| Product / solution | 6 | P33-P38 |
+| Planning / org | 6 | P39-P44 |
+| Ecosystem / community | 6 | P45-P50 |
 
-## 快速开始（agent 视角）
+## Quick start (agent view)
 
-1. 读 `templates/INDEX.md` 按内容类型选模板
-2. 复制 `slideXX.xml` + `assets/*.png` 到工作目录
-3. 按 INDEX 的『替换』清单定点替换示例内容
-4. 用官方 lint 校验：`python3 lark-slides/scripts/xml_lint.py --input slide.xml`
-5. 通过 `lark-cli slides +create / +add-slide` 发布到飞书
+1. Read `templates/INDEX.md`, pick a template by content type
+2. Copy `slideXX.xml` + `assets/*.png` into a work dir
+3. Replace sample content per the INDEX "replace" checklist (templates are a starting point — adjust layout/density to fit content, keep the brand tokens)
+4. Lint: `python3 scripts/review_layout.py --input slide.xml`
+5. Publish via `lark-cli slides +create / +add-slide`
 
-## 设计要点
+## Design tokens
 
-- 纯白画布 `#FFFFFF` + 粗黑标题 `#171717` + 白卡细边框 `#D6D6D2`
-- 珊瑚红 `#FF5A5F` 为唯一品牌强调色（Logo #FF5757）
-- 黑按钮 = 唯一 CTA；克制彩线（粉/青/紫/蓝/绿/黄）
-- 17 条反模式（禁蓝紫渐变 / 禁珊瑚红铺满 / 禁重阴影玻璃态...）
-- 模板实际色板与字号见 SKILL.md（与规范兼容但更精确，以模板为准）
+- White canvas `#FFFFFF` + bold black headings `#171717` + white cards with thin border `#D6D6D2`
+- Coral red `#FF5A5F` as the single brand accent (logo #FF5757)
+- Black button = the only CTA; restrained accent lines (pink/cyan/purple/blue/green/yellow)
+- 17 anti-patterns (no blue-purple gradients / no coral-red fills / no heavy shadows-glassmorphism...)
+- Exact palette & font sizes: see SKILL.md (template values are authoritative)
 
-## 依赖
+## Dependencies
 
-- [larksuite/cli](https://github.com/larksuite/cli)（飞书幻灯片 XML 操作）
-- 官方 `xml_lint.py` 校验脚本（lark-slides skill 内）
+- [larksuite/cli](https://github.com/larksuite/cli) (Lark Slides XML operations)
+- Official `xml_lint.py` (inside the lark-slides skill) for XML validation
 
 ## License
 
-MIT © 2026 Cherry Studio
+MIT © 2026

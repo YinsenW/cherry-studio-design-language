@@ -6,9 +6,9 @@ Built as a reusable SKILL.md so agents can produce polished, on-brand presentati
 
 ## Template preview
 
-![51-page template library preview](docs/template-preview.jpg)
+![51-page template library preview (HD)](docs/template-preview-hd.jpg)
 
-*Sample pages: cover, TOC, three-column, statement, step cards (P16), metric grid, comparison table, process flow, feature matrix, ROI.*
+*Sample pages rendered as crisp vectors: cover, TOC, three-column, statement, step cards (P16), metric grid, comparison table, process flow, feature matrix, ROI. Full-resolution vector previews of every page live in [`docs/preview/`](docs/preview/).*
 
 ## What's inside
 
@@ -26,7 +26,8 @@ Built as a reusable SKILL.md so agents can produce polished, on-brand presentati
 │   ├── review_layout.py     # Automated layout check (overlap / overflow / out-of-bounds)
 │   └── review_design.py     # Design guardrails G1-G8 (color whitelist / typography / CTA / density)
 └── docs/
-    └── template-preview.jpg # 10-page preview grid
+    ├── template-preview-hd.jpg # 10-page HD preview grid (2× scale)
+    └── preview/                # 51 per-page vector SVG previews + sample HD PNG
 ```
 
 ## Template coverage
